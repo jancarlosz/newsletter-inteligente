@@ -304,4 +304,4 @@ test(news): adicionar testes unitários do NewsService
 
 ## 👤 Autor
 
-**Jan Carlos** — [@jancarlosz](https://github.com/jancarlosz)
+**Jancarlos** — [@jancarlosz](https://github.com/jancarlosz)
