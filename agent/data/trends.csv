@@ -1,8 +1,19 @@
-topic,growth_rate,description
-Edge Computing,250%,processamento descentralizado perto do usuário
-Realidade Mista Corporativa,180%,treinamento avançado utilizando headsets VR e AR
-Computação Espacial,300%,interfaces e aplicações sem telas físicas
-Modelos de Linguagem Locais,400%,modelos que rodam no celular do usuário sem internet
-Redes 6G,150%,desenvolvimento da próxima geração de redes móveis
-Biohacking e Implantes,120%,tecnologia embutida no corpo humano para saúde
-Robótica Autônoma de Entrega,210%,robôs fazendo entregas de última milha em cidades
+topic,growth_rate,category_hint,sentiment,impact_level,description,source_reference
+Edge Computing,250%,hardware,positive,high,Processamento descentralizado perto do usuário final reduz latência em 80% — adoção em fábricas inteligentes cresce exponencialmente,Gartner 2026
+Realidade Mista Corporativa,180%,hardware,positive,medium,Treinamento avançado com headsets VR e AR economiza 40% em custos de capacitação nas empresas Fortune 500,McKinsey Digital
+Computação Espacial,300%,inteligencia-artificial,positive,high,Apple Vision Pro e concorrentes abrem novo mercado de interfaces sem telas físicas avaliado em US$ 50 bi,Bloomberg Tech
+Modelos de Linguagem Locais,400%,inteligencia-artificial,positive,critical,Modelos que rodam no celular sem internet — privacidade total e inferência em milissegundos. Google e Apple lideram a corrida,TechCrunch
+Redes 6G,150%,hardware,neutral,medium,Desenvolvimento da próxima geração de redes móveis promete velocidades de 1 Tbps — testes iniciais na Coreia do Sul e Japão,IEEE Spectrum
+Biohacking e Implantes,120%,ciencia-espaco,controversial,medium,Tecnologia embutida no corpo humano para monitoramento de saúde: Neuralink de Elon Musk avança em testes clínicos,Nature Medicine
+Robótica Autônoma de Entrega,210%,startups,positive,high,Robôs fazendo entregas de última milha — iFood e Amazon testam frotas em São Paulo e Seattle,Reuters Tech
+Criptografia Pós-Quântica,350%,ciberseguranca,urgent,critical,NIST finaliza padrões contra computadores quânticos — empresas correm para migrar antes de 2028. Bancos são prioridade,NIST Gov
+Zero Trust Architecture,280%,ciberseguranca,positive,high,Modelo Zero Trust substitui VPNs tradicionais: nunca confie e sempre verifique. Adoção obrigatória no governo americano,US Cybersecurity Agency
+IA Generativa no Código,500%,programacao,positive,critical,GitHub Copilot e concorrentes já escrevem 60% do código em empresas de tecnologia — desenvolvedores viram supervisores,GitHub Blog
+Blockchain para Supply Chain,160%,blockchain,positive,medium,Rastreabilidade end-to-end de produtos usando smart contracts — Walmart e Nestlé já implementam em escala global,Deloitte Insights
+Computação Quântica Comercial,200%,ciencia-espaco,positive,high,IBM e Google atingem marcos de correção de erros quânticos — primeiras aplicações comerciais previstas para 2027,Science Magazine
+Serverless e Edge Functions,220%,cloud-computing,positive,medium,Cloudflare Workers e AWS Lambda@Edge eliminam a necessidade de gerenciar servidores — custo cai 70%,AWS Re:Invent 2026
+Kubernetes AI Workloads,190%,cloud-computing,positive,high,Orquestração de cargas de IA em clusters Kubernetes se torna padrão — NVIDIA e Red Hat lideram ecossistema,KubeCon 2026
+Startups de IA no Brasil,320%,startups,positive,high,Ecossistema brasileiro de startups de IA recebe US$ 2.3 bilhões em 2026 — recorde histórico para o país,LAVCA Report
+DevSecOps e Shift Left,175%,programacao,positive,medium,Segurança integrada desde o primeiro commit — ferramentas de SAST e DAST ganham adoção massiva em pipelines CI/CD,Snyk Annual Report
+Tokens de Ativos Reais (RWA),280%,blockchain,positive,high,Tokenização de imóveis e títulos públicos movimenta US$ 16 trilhões em projeção — BlackRock e JP Morgan lideram,CoinDesk Research
+Satelites de Internet LEO,230%,ciencia-espaco,positive,high,Starlink da SpaceX atinge 5 milhões de assinantes — constelações de satélites democratizam internet global,SpaceX Press
