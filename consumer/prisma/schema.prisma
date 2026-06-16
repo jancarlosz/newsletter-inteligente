@@ -1,0 +1,85 @@
+// ─── Prisma Schema ─────────────────────────────────────────────────────────────
+// Documentação: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Categorias de Notícias ───────────────────────────────────────────────────
+// Categorias (tags principais) como "Inteligência Artificial", "Cloud", etc.
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique // ex: "Inteligência Artificial"
+  slug        String   @unique // ex: "inteligencia-artificial"
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  news        News[]
+  users       UserPreference[]
+
+  @@map("categories")
+}
+
+// ─── Notícias ─────────────────────────────────────────────────────────────────
+// Geradas pelo agente curador e sumarizadas pela IA.
+model News {
+  id          String   @id @default(uuid())
+  title       String
+  summary     String   @db.Text
+  url         String   @unique // Para evitar duplicação da mesma fonte
+  source      String   // Ex: "TechCrunch", "Agente Interno"
+  publishedAt DateTime
+  
+  // SEO e Classificação
+  keywords    String[] // Array de palavras-chave extraídas pela IA
+  
+  // Relacionamento com Categoria
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+
+  @@index([publishedAt]) // Otimiza ordenação e filtros por data
+  @@map("news")
+}
+
+// ─── Usuários ─────────────────────────────────────────────────────────────────
+// Sistema de autenticação (Fase 2)
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamento: um usuário tem várias preferências de categorias
+  preferences UserPreference[]
+
+  @@map("users")
+}
+
+// ─── Preferências do Usuário ──────────────────────────────────────────────────
+// Tabela de junção (Muitos-para-Muitos explícito) para saber quais categorias
+// cada usuário quer receber em sua newsletter.
+model UserPreference {
+  id         String   @id @default(uuid())
+  userId     String
+  categoryId String
+  createdAt  DateTime @default(now())
+
+  // Relacionamentos
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  // Um usuário não pode adicionar a mesma categoria duas vezes
+  @@unique([userId, categoryId])
+  @@map("user_preferences")
+}
