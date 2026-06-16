@@ -11,7 +11,7 @@ const prisma = new PrismaClient();
 
 const categories = [
   {
-    name: 'Inteligência Artificial',
+    name: 'IA',
     slug: 'inteligencia-artificial',
     description:
       'Machine Learning, Deep Learning, LLMs, automação inteligente e tendências em IA.',
@@ -29,7 +29,7 @@ const categories = [
       'Ameaças, vazamentos de dados, criptografia, zero trust e segurança da informação.',
   },
   {
-    name: 'Programação e Desenvolvimento',
+    name: 'Dev & Software',
     slug: 'programacao',
     description:
       'Novas linguagens, frameworks, ferramentas de dev, DevOps e engenharia de software.',

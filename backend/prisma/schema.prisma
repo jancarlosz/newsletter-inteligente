@@ -33,6 +33,7 @@ model News {
   id          String   @id @default(uuid())
   title       String
   summary     String   @db.Text
+  content     String   @db.Text
   url         String   @unique // Para evitar duplicação da mesma fonte
   source      String   // Ex: "TechCrunch", "Agente Interno"
   publishedAt DateTime
