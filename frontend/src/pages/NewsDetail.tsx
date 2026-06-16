@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../services/api';
-import { Loader2, ArrowLeft, Calendar, Share2, Bookmark } from 'lucide-react';
+import { Loader2, ArrowLeft, Calendar } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '../components/ui/badge';
@@ -118,19 +118,7 @@ export function NewsDetail() {
           ))}
         </article>
 
-        {/* Footer Actions */}
-        <div className="mt-16 pt-8 border-t border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-sm font-semibold transition-colors">
-              <Share2 className="w-4 h-4" />
-              Compartilhar
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-sm font-semibold transition-colors">
-              <Bookmark className="w-4 h-4" />
-              Salvar
-            </button>
-          </div>
-        </div>
+
       </main>
     </div>
   );
