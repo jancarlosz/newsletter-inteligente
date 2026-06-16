@@ -15,13 +15,16 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Alias & Deprecation Handling */
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
 
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
