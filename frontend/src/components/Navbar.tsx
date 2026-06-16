@@ -25,9 +25,9 @@ export function Navbar() {
         {/* Espaçador flex esquerdo para balancear a direita e manter o centro exato */}
         <div className="flex-1 hidden md:block"></div>
 
-        {/* LOGO (Centro Absoluto) */}
-          <Link to="/" className="flex items-center gap-2 group absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
-            <img src="/logo-newsletter-branca.png" alt="Newsletter Logo" className="h-8 md:h-10 object-contain hover:opacity-90 transition-opacity" />
+        {/* LOGO (Centro no Desktop, Esquerda no Mobile) */}
+          <Link to="/" className="flex items-center gap-2 group md:absolute md:left-1/2 md:-translate-x-1/2 md:top-1/2 md:-translate-y-1/2 z-10 shrink-0">
+            <img src="/logo-newsletter-branca.png" alt="Newsletter Logo" className="h-6 sm:h-8 md:h-10 object-contain hover:opacity-90 transition-opacity" />
           </Link>
 
         {/* ÁREA DO USUÁRIO (Direita) */}
@@ -49,10 +49,10 @@ export function Navbar() {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Entrar</Button>
+                <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white px-2 sm:px-4 text-xs sm:text-sm h-8 sm:h-10">Entrar</Button>
               </Link>
               <Link to="/register">
-                <Button className="bg-white text-[#004b87] hover:bg-blue-50 font-bold">Assinar</Button>
+                <Button className="bg-white text-[#004b87] hover:bg-blue-50 font-bold px-3 sm:px-4 text-xs sm:text-sm h-8 sm:h-10">Assinar</Button>
               </Link>
             </>
           )}

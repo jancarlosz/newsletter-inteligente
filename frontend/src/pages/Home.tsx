@@ -86,6 +86,9 @@ export function Home() {
         }
         setNews(items);
         setTotalPages(data.meta.lastPage);
+        
+        // Rola a tela de volta para o topo suavemente sempre que o feed for atualizado
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
@@ -113,18 +116,20 @@ export function Home() {
 
         {/* Banner de Feed Personalizado */}
         {isAuthenticated && userPreferences.length > 0 && (
-          <div className="mb-6 flex items-center justify-between bg-white rounded-2xl p-4 px-6 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-3">
-              {usePersonalizedFeed ? (
-                <Sparkles className="w-5 h-5 text-[#004b87]" />
-              ) : (
-                <Globe className="w-5 h-5 text-slate-500" />
-              )}
+          <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white rounded-2xl p-4 md:px-6 shadow-sm border border-slate-100">
+            <div className="flex items-start md:items-center gap-3">
+              <div className="mt-1 md:mt-0 shrink-0">
+                {usePersonalizedFeed ? (
+                  <Sparkles className="w-5 h-5 text-[#004b87]" />
+                ) : (
+                  <Globe className="w-5 h-5 text-slate-500" />
+                )}
+              </div>
               <div>
                 <span className="text-sm font-semibold text-slate-800">
                   {usePersonalizedFeed ? 'Feed Personalizado' : 'Todas as Notícias'}
                 </span>
-                <span className="text-xs text-slate-500 block">
+                <span className="text-xs text-slate-500 block mt-0.5 leading-relaxed">
                   {usePersonalizedFeed 
                     ? `Mostrando apenas: ${userPreferences.map(s => categories.find(c => c.slug === s)?.name).filter(Boolean).join(', ')}` 
                     : 'Exibindo notícias de todas as categorias'
@@ -132,10 +137,10 @@ export function Home() {
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 w-full md:w-auto justify-end border-t md:border-t-0 border-slate-100 pt-3 md:pt-0">
               <button
                 onClick={() => { setUsePersonalizedFeed(!usePersonalizedFeed); setPage(1); }}
-                className={`text-xs font-semibold px-4 py-2 rounded-full transition-colors ${
+                className={`text-xs font-semibold px-4 py-2 rounded-full transition-colors whitespace-nowrap ${
                   usePersonalizedFeed 
                     ? 'bg-slate-100 text-slate-600 hover:bg-slate-200' 
                     : 'bg-[#004b87] text-white hover:bg-[#003865]'
@@ -145,7 +150,7 @@ export function Home() {
               </button>
               <Link
                 to="/preferences"
-                className="text-xs text-[#004b87] hover:underline font-medium"
+                className="text-xs text-[#004b87] hover:underline font-medium whitespace-nowrap"
               >
                 Editar
               </Link>
@@ -156,8 +161,8 @@ export function Home() {
         {/* BARRA DE NAVEGAÇÃO SECUNDÁRIA (Filtros) */}
         <div className="bg-white rounded-2xl p-4 px-6 shadow-sm border border-slate-100 flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-8">
           
-          {/* Categorias (Esquerda) */}
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 flex-1">
+          {/* Categorias (Desktop) */}
+          <div className="hidden md:flex flex-wrap items-center gap-x-5 gap-y-3 flex-1">
             <button
               className={`whitespace-nowrap text-xs md:text-sm font-bold uppercase tracking-wider transition-colors ${
                 categorySlug === '' 
@@ -182,7 +187,7 @@ export function Home() {
               </button>
             ))}
 
-            {/* Dropdown Mais Seções */}
+            {/* Dropdown Mais Seções (Desktop) */}
             {moreCategories.length > 0 && (
               <div className="relative group z-40">
                 <button className={`flex items-center gap-1 whitespace-nowrap text-xs md:text-sm font-bold uppercase tracking-wider transition-colors pb-1 border-b-2 ${
@@ -211,8 +216,49 @@ export function Home() {
             )}
           </div>
 
-          {/* Período (Direita) */}
-          <div className="shrink-0 w-full xl:w-56 border-t xl:border-t-0 xl:border-l border-slate-100 pt-4 xl:pt-0 xl:pl-5 flex justify-end">
+          {/* Filtros Mobile (Lado a lado: Categoria e Período) */}
+          <div className="flex md:hidden gap-3 w-full">
+            <div className="flex-1">
+              <Select value={categorySlug || 'todas'} onValueChange={(val) => handleCategoryClick(val === 'todas' ? '' : val)}>
+                <SelectTrigger className="w-full bg-slate-50 border-transparent rounded-xl h-10 px-3 focus:ring-[#004b87]">
+                  <div className="flex items-center gap-2 truncate">
+                    <Filter className="w-4 h-4 text-slate-500 shrink-0" />
+                    <SelectValue className="truncate text-xs">
+                      {categorySlug === '' ? 'Todas' : categories.find(c => c.slug === categorySlug)?.name || 'Categoria'}
+                    </SelectValue>
+                  </div>
+                </SelectTrigger>
+                <SelectContent alignItemWithTrigger={false} sideOffset={8} className="rounded-xl bg-white shadow-xl border-slate-200 p-1 max-h-60">
+                  <SelectItem value="todas" className="rounded-lg cursor-pointer text-sm">Todas as Seções</SelectItem>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.slug} value={cat.slug} className="rounded-lg cursor-pointer text-sm">{cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex-1">
+              <Select value={period || 'todos'} onValueChange={(val) => { setPeriod(val === 'todos' ? '' : (val || '')); setPage(1); }}>
+                <SelectTrigger className="w-full bg-slate-50 border-transparent rounded-xl h-10 px-3 focus:ring-[#004b87]">
+                  <div className="flex items-center gap-2 truncate">
+                    <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
+                    <SelectValue className="truncate text-xs">
+                      {period === 'day' ? 'Hoje' : period === 'week' ? 'Semana' : period === 'month' ? 'Mês' : 'Todo o tempo'}
+                    </SelectValue>
+                  </div>
+                </SelectTrigger>
+                <SelectContent alignItemWithTrigger={false} sideOffset={8} className="rounded-xl bg-white shadow-xl border-slate-200 p-1">
+                  <SelectItem value="todos" className="rounded-lg cursor-pointer text-sm">Todo o tempo</SelectItem>
+                  <SelectItem value="day" className="rounded-lg cursor-pointer text-sm">Hoje</SelectItem>
+                  <SelectItem value="week" className="rounded-lg cursor-pointer text-sm">Esta semana</SelectItem>
+                  <SelectItem value="month" className="rounded-lg cursor-pointer text-sm">Este mês</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Período (Desktop) */}
+          <div className="hidden md:flex shrink-0 w-full xl:w-56 border-t xl:border-t-0 xl:border-l border-slate-100 pt-4 xl:pt-0 xl:pl-5 justify-end">
             <Select value={period || 'todos'} onValueChange={(val) => { setPeriod(val === 'todos' ? '' : (val || '')); setPage(1); }}>
               <SelectTrigger className="w-full bg-slate-50 border-transparent rounded-xl h-10 px-4 focus:ring-[#004b87]">
                 <div className="flex items-center gap-2">
@@ -251,26 +297,32 @@ export function Home() {
                 {/* Linha Superior: 1 Gigante + 2 Pequenos Stackados */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
                   {/* Manchete Principal (66%) */}
-                  <div className="lg:col-span-8">
+                  <div className="lg:col-span-8 animate-in fade-in zoom-in-95 duration-1000 fill-mode-both">
                     {topNews[0] && <NewsCard news={topNews[0]} layout="overlay" />}
                   </div>
                   
                   {/* Coluna Direita com 2 Destaques Secundários (33%) */}
                   <div className="lg:col-span-4 flex flex-col gap-6">
-                    <div className="flex-1">
+                    <div className="flex-1 animate-in fade-in slide-in-from-right-8 duration-700 delay-200 fill-mode-both">
                       {topNews[1] && <NewsCard news={topNews[1]} layout="grid" />}
                     </div>
-                    <div className="flex-1 hidden sm:block">
+                    <div className="flex-1 hidden sm:block animate-in fade-in slide-in-from-right-8 duration-700 delay-300 fill-mode-both">
                       {topNews[2] && <NewsCard news={topNews[2]} layout="grid" />}
                     </div>
                   </div>
                 </div>
 
                 {/* Linha Inferior: 3 Destaques Terciários */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {topNews[3] && <NewsCard news={topNews[3]} layout="grid" />}
-                  {topNews[4] && <NewsCard news={topNews[4]} layout="grid" />}
-                  {topNews[5] && <NewsCard news={topNews[5]} layout="grid" />}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                  <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-400 fill-mode-both">
+                    {topNews[3] && <NewsCard news={topNews[3]} layout="grid" />}
+                  </div>
+                  <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500 fill-mode-both">
+                    {topNews[4] && <NewsCard news={topNews[4]} layout="grid" />}
+                  </div>
+                  <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-600 fill-mode-both">
+                    {topNews[5] && <NewsCard news={topNews[5]} layout="grid" />}
+                  </div>
                 </div>
               </section>
             )}
@@ -291,8 +343,14 @@ export function Home() {
               {/* FEED DE NOTÍCIAS (ESQUERDA - 70%) */}
               <div className="lg:col-span-8 flex flex-col gap-4">
                 {feedNews.length > 0 ? (
-                  feedNews.map((item) => (
-                    <NewsCard key={item.id} news={item} layout="horizontal" />
+                  feedNews.map((item, idx) => (
+                    <div 
+                      key={item.id} 
+                      className="animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both"
+                      style={{ animationDelay: `${(idx % 10) * 100}ms` }}
+                    >
+                      <NewsCard news={item} layout="horizontal" />
+                    </div>
                   ))
                 ) : page !== 1 ? (
                   <p className="text-slate-500">Não há mais notícias nesta página.</p>
@@ -325,20 +383,7 @@ export function Home() {
               {/* SIDEBAR (DIREITA - 30%) */}
               <aside className="lg:col-span-4 hidden lg:block">
                 <div className="sticky top-24 flex flex-col gap-8">
-
-                  {/* WIDGET: Banner Placeholder */}
-                  <div className="bg-slate-900 rounded-2xl p-6 text-center shadow-lg relative overflow-hidden group cursor-pointer">
-                    <div className="absolute inset-0 bg-[#004b87] opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
-                    <div className="relative z-10">
-                      <span className="text-blue-300 text-xs font-bold uppercase tracking-wider">Publicidade</span>
-                      <h4 className="text-white font-extrabold text-2xl mt-4 mb-2">Assine a Newsletter Premium</h4>
-                      <p className="text-slate-400 text-sm mb-6">Receba análises profundas diretamente no seu e-mail.</p>
-                      <button className="bg-white text-slate-900 font-bold py-2 px-6 rounded-full w-full hover:bg-blue-50 transition-colors">
-                        Assinar Agora
-                      </button>
-                    </div>
-                  </div>
-
+                  {/* Sidebar agora limpa para dar foco total ao feed */}
                 </div>
               </aside>
 

@@ -34,7 +34,7 @@ export function Login() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] w-full bg-[#f4f6f8]">
+    <div className="flex min-h-screen w-full bg-[#f4f6f8]">
       {/* Left Panel - Branding (Azul Estadão) */}
       <div className="hidden lg:flex w-1/2 bg-[#004b87] p-16 flex-col justify-center items-start text-white relative overflow-hidden">
         {/* Subtle decorative circles */}

@@ -45,7 +45,7 @@ export function NewsCard({ news, layout = 'grid' }: NewsCardProps) {
   if (layout === 'overlay') {
     return (
       <Card 
-        className="group relative overflow-hidden flex flex-col justify-end transition-all hover:shadow-lg cursor-pointer h-full min-h-[400px] border-none"
+        className="group relative overflow-hidden flex flex-col justify-end transition-all hover:shadow-lg cursor-pointer h-full min-h-[400px] border-none rounded-2xl"
         onClick={handleOpen}
       >
         <div className="absolute inset-0 bg-slate-200 z-0"></div>
@@ -83,10 +83,10 @@ export function NewsCard({ news, layout = 'grid' }: NewsCardProps) {
   if (layout === 'horizontal') {
     return (
       <Card 
-        className="group overflow-hidden flex flex-col sm:flex-row transition-all hover:shadow-md cursor-pointer border-b border-x-0 border-t-0 sm:border-transparent sm:border-b-slate-200 rounded-none bg-transparent hover:bg-white"
+        className="group overflow-hidden flex flex-col sm:flex-row transition-all hover:shadow-md cursor-pointer border border-slate-200 bg-white rounded-2xl"
         onClick={handleOpen}
       >
-        <div className="relative w-full sm:w-[240px] h-48 sm:h-auto overflow-hidden bg-slate-100 shrink-0 sm:rounded-xl">
+        <div className="relative w-full sm:w-[240px] h-48 sm:h-auto overflow-hidden bg-slate-100 shrink-0">
           <img 
             src={imageUrl} 
             alt={news.title}
@@ -95,7 +95,7 @@ export function NewsCard({ news, layout = 'grid' }: NewsCardProps) {
           />
         </div>
         
-        <div className="flex flex-col flex-grow py-4 sm:p-5 sm:pl-6 justify-between">
+        <div className="flex flex-col flex-grow p-5 sm:p-5 sm:pl-6 justify-between">
           <div>
             {news.category && (
               <Badge variant="default" className="mb-3 bg-[#004b87]/10 text-[#004b87] hover:bg-[#004b87]/20 border-none font-semibold">
@@ -121,7 +121,7 @@ export function NewsCard({ news, layout = 'grid' }: NewsCardProps) {
   // LAYOUT 3: Grid Padrão (Imagem em cima, texto embaixo)
   return (
     <Card 
-      className="group overflow-hidden flex flex-col justify-between transition-all hover:shadow-md cursor-pointer border border-slate-200 bg-white h-full"
+      className="group overflow-hidden flex flex-col justify-between transition-all hover:shadow-md cursor-pointer border border-slate-200 bg-white h-full rounded-2xl"
       onClick={handleOpen}
     >
       <div className="relative w-full h-48 overflow-hidden bg-slate-100 shrink-0">
