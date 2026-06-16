@@ -1,7 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
-import { Newspaper, LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon } from 'lucide-react';
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -12,12 +12,17 @@ export function Navbar() {
     navigate('/');
   };
 
+  const location = useLocation();
+  if (location.pathname === '/login' || location.pathname === '/register') {
+    return null;
+  }
+
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-primary">
-          <Newspaper className="h-6 w-6" />
-          <span>Singulari News</span>
+        <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-[#004b87]">
+          <img src="/icon.svg" alt="Newsletter Digital" className="h-7 w-7" />
+          <span>Newsletter Digital</span>
         </Link>
 
         <div className="flex items-center gap-4">
