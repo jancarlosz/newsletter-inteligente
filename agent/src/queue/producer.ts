@@ -15,7 +15,7 @@ export class NewsProducer {
   private queue: Queue;
 
   constructor() {
-    this.queue = new Queue('newsQueue', { connection });
+    this.queue = new Queue('newsQueue', { connection: connection as any });
   }
 
   async publish(news: ProcessedNews) {
