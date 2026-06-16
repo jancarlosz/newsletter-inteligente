@@ -1,0 +1,115 @@
+services:
+  # ─── Banco de Dados Relacional ────────────────────────────────────
+  # Usamos PostgreSQL pela natureza relacional dos dados:
+  # notícias pertencem a categorias, usuários têm preferências.
+  # JOINs e integridade referencial são nativos e eficientes.
+  postgres:
+    image: postgres:16-alpine
+    container_name: newsletter_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-newsletter_db}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-postgres}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Cache + Message Broker ───────────────────────────────────────
+  # Redis in-memory para o BullMQ gerenciar filas de processamento.
+  # Operações em microsegundos — ideal para filas de alta frequência.
+  redis:
+    image: redis:7-alpine
+    container_name: newsletter_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── API Backend (NestJS) ─────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: newsletter_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-newsletter_db}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-supersecretjwtkey}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-<CHAVE_DE_API>}
+      PORT: 3000
+      NODE_ENV: production
+    ports:
+      - '3000:3000'
+
+  # ─── Frontend (React + Vite) ──────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: newsletter_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '80:80'
+
+  # ─── Agente Curador (Worker autônomo) ─────────────────────────────
+  # Serviço separado que roda em background, gerando notícias
+  # a cada 30 minutos usando múltiplas estratégias de curadoria.
+  agent:
+    build:
+      context: ./agent
+      dockerfile: Dockerfile
+    container_name: newsletter_agent
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-newsletter_db}
+      REDIS_URL: redis://redis:6379
+
+  # ─── Serviço Consumidor (BullMQ Worker) ───────────────────────────
+  # Consome a fila do BullMQ, chama a IA para sumarizar e salva no banco.
+  # Desacoplado do agente para maior resiliência e escalabilidade.
+  consumer:
+    build:
+      context: ./consumer
+      dockerfile: Dockerfile
+    container_name: newsletter_consumer
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-newsletter_db}
+      REDIS_URL: redis://redis:6379
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-<CHAVE_DE_API>}
+
+volumes:
+  postgres_data:
+  redis_data:
