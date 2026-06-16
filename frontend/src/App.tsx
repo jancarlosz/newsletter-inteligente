@@ -4,9 +4,8 @@ import { Navbar } from './components/Navbar';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 
-// Exemplo de páginas vazias para as rotas funcionarem
-const Home = () => <div className="container mt-8"><h1 className="text-2xl font-bold">Últimas Notícias</h1></div>;
-const Preferences = () => <div className="container mt-8"><h1 className="text-2xl font-bold">Minhas Preferências</h1></div>;
+import { Home } from './pages/Home';
+import { Preferences } from './pages/Preferences';
 
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated, loading } = useAuth();
