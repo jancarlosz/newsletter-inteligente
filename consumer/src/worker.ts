@@ -29,6 +29,7 @@ export const newsWorker = new Worker(
       await saver.save(
         job.data.title,
         summary,
+        job.data.content,
         job.data.source,
         job.data.categorySlug
       );

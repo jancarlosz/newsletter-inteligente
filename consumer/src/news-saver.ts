@@ -6,6 +6,7 @@ export class NewsSaver {
   async save(
     title: string,
     summary: string,
+    content: string,
     source: string,
     categorySlug: string
   ) {
@@ -20,12 +21,13 @@ export class NewsSaver {
 
     // 2. Salva a notícia e evita duplicações pelo URL
     // Vamos gerar uma URL fictícia ou um Hash único baseado no título
-    const generatedUrl = `https://news.singulari.tech/${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    const generatedUrl = `https://www.google.com/search?q=${encodeURIComponent(title)}`;
 
-    const news = await prisma.news.create({
+    const saved = await prisma.news.create({
       data: {
         title,
         summary,
+        content,
         url: generatedUrl,
         source,
         publishedAt: new Date(),
@@ -33,8 +35,8 @@ export class NewsSaver {
       },
     });
 
-    console.log(`✅ Notícia salva com sucesso: [${news.id}] ${title}`);
-    return news;
+    console.log(`✅ Notícia salva com sucesso: [${saved.id}] ${title}`);
+    return saved;
   }
 
   async disconnect() {
