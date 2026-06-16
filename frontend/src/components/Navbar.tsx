@@ -17,37 +17,43 @@ export function Navbar() {
     return null;
   }
 
-  return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-[#004b87]">
-          <img src="/icon.svg" alt="Newsletter Digital" className="h-7 w-7" />
-          <span>Newsletter Digital</span>
-        </Link>
 
-        <div className="flex items-center gap-4">
+  return (
+    <nav className="bg-[#004b87] text-white shadow-sm sticky top-0 z-50">
+      <div className="container relative flex h-16 items-center justify-between gap-4">
+        
+        {/* Espaçador flex esquerdo para balancear a direita e manter o centro exato */}
+        <div className="flex-1 hidden md:block"></div>
+
+        {/* LOGO (Centro Absoluto) */}
+          <Link to="/" className="flex items-center gap-2 group absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
+            <img src="/logo-newsletter-branca.png" alt="Newsletter Logo" className="h-8 md:h-10 object-contain hover:opacity-90 transition-opacity" />
+          </Link>
+
+        {/* ÁREA DO USUÁRIO (Direita) */}
+        <div className="flex-1 flex items-center justify-end gap-2 shrink-0">
           {isAuthenticated ? (
             <>
-              <span className="text-sm text-muted-foreground hidden sm:inline-block">
+              <span className="text-sm text-blue-200 hidden xl:inline-block mr-2 font-medium">
                 Olá, {user?.name?.split(' ')[0]}
               </span>
-              <Button variant="ghost" asChild>
-                <Link to="/preferences">
-                  <UserIcon className="h-4 w-4 mr-2" /> Preferências
-                </Link>
-              </Button>
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" /> Sair
+              <Link to="/preferences" title="Preferências">
+                <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">
+                  <UserIcon className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white" onClick={handleLogout} title="Sair">
+                <LogOut className="h-5 w-5" />
               </Button>
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild>
-                <Link to="/login">Entrar</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/register">Criar Conta</Link>
-              </Button>
+              <Link to="/login">
+                <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Entrar</Button>
+              </Link>
+              <Link to="/register">
+                <Button className="bg-white text-[#004b87] hover:bg-blue-50 font-bold">Assinar</Button>
+              </Link>
             </>
           )}
         </div>
