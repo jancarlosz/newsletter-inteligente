@@ -1,8 +1,18 @@
 import { PrismaClient } from '@prisma/client';
+import { createHash } from 'crypto';
 
 const prisma = new PrismaClient();
 
 export class NewsSaver {
+  /**
+   * Gera uma URL única baseada no hash do título.
+   * Garante unicidade determinística sem depender de URLs externas.
+   */
+  private generateUniqueUrl(title: string): string {
+    const hash = createHash('sha256').update(title).digest('hex').substring(0, 12);
+    return `internal://news/${hash}`;
+  }
+
   async save(
     title: string,
     summary: string,
@@ -19,16 +29,21 @@ export class NewsSaver {
       throw new Error(`Categoria ${categorySlug} não encontrada no banco!`);
     }
 
-    // 2. Salva a notícia e evita duplicações pelo URL
-    // Vamos gerar uma URL fictícia ou um Hash único baseado no título
-    const generatedUrl = `https://www.google.com/search?q=${encodeURIComponent(title)}`;
+    // 2. Gera URL única baseada no hash do título
+    const uniqueUrl = this.generateUniqueUrl(title);
 
-    const saved = await prisma.news.create({
-      data: {
+    // 3. Upsert: cria se não existe, atualiza se já existe (idempotência)
+    const saved = await prisma.news.upsert({
+      where: { url: uniqueUrl },
+      update: {
+        summary,
+        content,
+      },
+      create: {
         title,
         summary,
         content,
-        url: generatedUrl,
+        url: uniqueUrl,
         source,
         publishedAt: new Date(),
         categoryId: category.id,
