@@ -75,7 +75,7 @@ services:
 
   # ─── Agente Curador (Worker autônomo) ─────────────────────────────
   # Serviço separado que roda em background, gerando notícias
-  # a cada 30 minutos usando múltiplas estratégias de curadoria.
+  # a cada 10 minutos usando múltiplas estratégias de curadoria.
   agent:
     build:
       context: ./agent

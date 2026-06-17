@@ -4,7 +4,7 @@
  * ─────────────────────────────────────────────────────────────────────
  * 
  * Serviço autônomo (worker) que roda em background e executa um pipeline
- * completo de curadoria de notícias a cada 30 minutos via cron job.
+ * completo de curadoria de notícias a cada 10 minutos via cron job.
  * 
  * ┌─────────────────────────────────────────────────────────────────┐
  * │                    PIPELINE DO AGENTE                           │
@@ -173,16 +173,16 @@ console.log('║                                                        ║');
 console.log('║  Estratégias: TemplateGenerator, CsvAnalyzer           ║');
 console.log('║  Processadores: KeywordClassifier, SentimentAnalyzer,  ║');
 console.log('║                 EntityExtractor, RelevanceScorer       ║');
-console.log('║  Cron: a cada 30 minutos                               ║');
+console.log('║  Cron: a cada 10 minutos                               ║');
 console.log('╚══════════════════════════════════════════════════════════╝');
 
 // Executa imediatamente na inicialização
 runAgent();
 
-// Configura cron para rodar a cada 30 minutos
-const job = new CronJob('* * * * *', async () => {
+// Configura cron para rodar a cada 10 minutos
+const job = new CronJob('*/10 * * * *', async () => {
   await runAgent();
 });
 
 job.start();
-console.log('⏰ Cron job ativo: próximo ciclo em 30 minutos.\n');
+console.log('⏰ Cron job ativo: próximo ciclo em 10 minutos.\n');
