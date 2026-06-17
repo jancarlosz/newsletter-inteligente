@@ -42,23 +42,27 @@ O **Newsletter Inteligente** é um sistema completo de curadoria automatizada de
 │                      BACKEND (NestJS)                            │
 │    API REST com autenticação JWT, paginação e filtros            │
 └──────────────────┬──────────────────────────────────────────────┘
-                   │ Prisma ORM
+                   │ Prisma ORM (leitura)
 ┌──────────────────▼──────────────────────────────────────────────┐
 │                    PostgreSQL 16                                  │
 │         news | categories | users | user_preferences             │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│              PROCESSAMENTO ASSÍNCRONO                            │
-│                                                                  │
-│  ┌──────────────────┐    ┌──────────────┐    ┌───────────────┐  │
-│  │  Agente Curador  │───▶│  BullMQ/Redis│───▶│   Consumer    │  │
-│  │  (cron 10 min)   │    │   (Fila)     │    │   (Worker)    │  │
-│  │                  │    └──────────────┘    └──────┬────────┘  │
-│  │ • Template Gen.  │                               │           │
-│  │ • CSV Analyzer   │                        ┌──────▼────────┐  │
-│  │ • Classifier     │                        │  Gemini API   │  │
-│  └──────────────────┘                        │  (Resumos)    │  │
+└──────────────────▲──────────────────────────────────────────────┘
+                   │ Prisma ORM (escrita)
+┌──────────────────┼─────────────────────────────────────────────┐
+│                  │       PROCESSAMENTO ASSÍNCRONO                │
+│                  │                                               │
+│  ┌──────────────┐│   ┌──────────────┐    ┌───────────────────┐  │
+│  │Agente Curador││   │  BullMQ/Redis│    │    Consumer       │  │
+│  │(cron 10 min) ├┼──▶│   (Fila)     │───▶│    (Worker)       │  │
+│  │              ││   └──────────────┘    │                   │  │
+│  │• Template Gen││                       │ 1. Chama Gemini   │  │
+│  │• CSV Analyzer││                       │ 2. Salva no banco─┘  │
+│  │• Classifier  ││                       └────────┬──────────┘  │
+│  └──────────────┘│                                │              │
+│                  │                         ┌──────▼────────┐    │
+│                  │                         │  Gemini API   │    │
+│                  │                         │  (Resumos IA) │    │
+│                  │                         └───────────────┘    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
