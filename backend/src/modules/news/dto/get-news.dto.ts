@@ -37,4 +37,12 @@ export class GetNewsDto {
   @IsOptional()
   @IsString()
   category?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filtrar por múltiplas categorias (slugs separados por vírgula). Usado para feed personalizado.',
+    example: 'inteligencia-artificial,cloud-computing,ciberseguranca',
+  })
+  @IsOptional()
+  @IsString()
+  categories?: string;
 }

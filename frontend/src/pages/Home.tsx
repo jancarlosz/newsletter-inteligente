@@ -77,14 +77,14 @@ export function Home() {
     if (categorySlug) url += `&category=${categorySlug}`;
     if (period && period !== 'todos') url += `&period=${period}`;
 
+    // Feed personalizado: envia as categorias preferidas para o backend filtrar via SQL
+    if (usePersonalizedFeed && userPreferences.length > 0 && !categorySlug) {
+      url += `&categories=${userPreferences.join(',')}`;
+    }
+
     apiFetch(url)
       .then((data) => {
-        let items: News[] = data.data;
-        // Se feed personalizado ativo e sem filtro manual de categoria, filtra pelas preferências
-        if (usePersonalizedFeed && userPreferences.length > 0 && !categorySlug) {
-          items = items.filter(n => userPreferences.includes(n.category?.slug));
-        }
-        setNews(items);
+        setNews(data.data);
         setTotalPages(data.meta.lastPage);
         
         // Rola a tela de volta para o topo suavemente sempre que o feed for atualizado
@@ -337,11 +337,11 @@ export function Home() {
               </div>
             )}
 
-            {/* SEÇÃO PRINCIPAL: FEED VERTICAL + SIDEBAR */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            {/* SEÇÃO PRINCIPAL: FEED VERTICAL */}
+            <div>
               
-              {/* FEED DE NOTÍCIAS (ESQUERDA - 70%) */}
-              <div className="lg:col-span-8 flex flex-col gap-4">
+              {/* FEED DE NOTÍCIAS */}
+              <div className="flex flex-col gap-4">
                 {feedNews.length > 0 ? (
                   feedNews.map((item, idx) => (
                     <div 
@@ -379,13 +379,6 @@ export function Home() {
                   </div>
                 )}
               </div>
-
-              {/* SIDEBAR (DIREITA - 30%) */}
-              <aside className="lg:col-span-4 hidden lg:block">
-                <div className="sticky top-24 flex flex-col gap-8">
-                  {/* Sidebar agora limpa para dar foco total ao feed */}
-                </div>
-              </aside>
 
             </div>
           </>

@@ -7,7 +7,7 @@ export class NewsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(dto: GetNewsDto) {
-    const { page = 1, limit = 10, period, category } = dto;
+    const { page = 1, limit = 10, period, category, categories } = dto;
     
     // Calcula paginação
     const skip = (page - 1) * limit;
@@ -15,8 +15,17 @@ export class NewsService {
     // Constrói filtro condicional "where"
     const where: any = {};
 
+    // Filtro por categoria única (ex: ?category=cloud-computing)
     if (category) {
       where.category = { slug: category };
+    }
+
+    // Filtro por múltiplas categorias — feed personalizado (ex: ?categories=ia,cloud,seguranca)
+    if (categories && !category) {
+      const slugList = categories.split(',').map(s => s.trim()).filter(Boolean);
+      if (slugList.length > 0) {
+        where.category = { slug: { in: slugList } };
+      }
     }
 
     if (period) {
