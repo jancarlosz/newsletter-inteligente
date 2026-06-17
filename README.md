@@ -53,7 +53,7 @@ O **Newsletter Inteligente** é um sistema completo de curadoria automatizada de
 │                                                                  │
 │  ┌──────────────────┐    ┌──────────────┐    ┌───────────────┐  │
 │  │  Agente Curador  │───▶│  BullMQ/Redis│───▶│   Consumer    │  │
-│  │  (cron 30 min)   │    │   (Fila)     │    │   (Worker)    │  │
+│  │  (cron 10 min)   │    │   (Fila)     │    │   (Worker)    │  │
 │  │                  │    └──────────────┘    └──────┬────────┘  │
 │  │ • Template Gen.  │                               │           │
 │  │ • CSV Analyzer   │                        ┌──────▼────────┐  │
@@ -66,44 +66,33 @@ O **Newsletter Inteligente** é um sistema completo de curadoria automatizada de
 
 ## Decisões Técnicas
 
-### 🗄️ Por que PostgreSQL e não MongoDB?
+### 🗄️ Banco de Dados — PostgreSQL
 
-Optei pelo **PostgreSQL** pelas seguintes razões:
+O modelo de dados é naturalmente relacional: notícias pertencem a categorias e usuários possuem preferências que referenciam essas mesmas categorias. O PostgreSQL atende a esses requisitos com garantias ACID, suporte a JOINs eficientes e índices B-tree nativos — ideais para as queries de listagem com filtros de período e paginação (`WHERE published_at >= X ORDER BY published_at DESC LIMIT N OFFSET N`).
 
-1. **Relacionamentos bem definidos:** Notícias pertencem a categorias, usuários têm preferências que referenciam categorias. Esse modelo é naturalmente relacional — JOINs resolvem de forma eficiente e com integridade garantida pelo banco.
-
-2. **Paginação e filtros otimizados:** A rota principal (`GET /news?period=day&page=2`) requer `WHERE published_at >= X ORDER BY published_at DESC LIMIT 10 OFFSET 10`. O PostgreSQL resolve isso com índices B-tree nativos, sem configuração adicional.
-
-3. **ACID e integridade:** Quando o consumidor processa uma notícia (chama IA + salva no banco), preciso garantir atomicidade. Se a inserção falhar no meio, tudo é revertido — nenhuma notícia fica em estado inconsistente.
-
-4. **Schema fixo e bem conhecido:** Toda notícia tem exatamente os mesmos campos. A flexibilidade do MongoDB seria desperdiçada aqui.
-
-> MongoDB seria a melhor escolha se as notícias tivessem estruturas radicalmente diferentes entre si (algumas com vídeos, outras com podcasts, cada uma com campos únicos) ou se a escala exigisse sharding horizontal desde o início.
+A atomicidade é especialmente importante no fluxo do consumidor: a chamada à IA e a persistência da notícia ocorrem dentro de uma mesma transação, garantindo que nenhum registro fique em estado inconsistente em caso de falha.
 
 ---
 
-### 🔄 Por que BullMQ + Redis como Message Broker?
+### 🔄 Processamento Assíncrono — BullMQ + Redis
 
-O **Agente Curador** não salva notícias diretamente no banco — ele **publica em uma fila**. O **Consumidor** processa assincronamente.
+O Agente Curador publica jobs em uma fila gerenciada pelo **BullMQ** (backed por Redis). O Consumidor processa esses jobs de forma independente, o que traz três benefícios arquiteturais:
 
-**Vantagens desta abordagem:**
+- **Desacoplamento:** o agente não tem dependência direta do consumidor nem da IA — cada serviço evolui e escala independentemente.
+- **Resiliência:** jobs com falha são reenfileirados automaticamente (até 3 tentativas configuradas).
+- **Escalabilidade horizontal:** é possível rodar múltiplos workers consumidores em paralelo sem alteração no código do agente.
 
-1. **Desacoplamento:** O agente não precisa saber sobre o consumidor nem sobre a IA. Se o serviço de IA cair, as mensagens aguardam na fila.
-2. **Resiliência:** BullMQ faz retry automático (até 3 tentativas) se um job falhar.
-3. **Escalabilidade:** Posso ter 1 agente e N consumidores processando em paralelo.
-
-**Por que Redis e não RabbitMQ/Kafka?**
-Para o escopo deste projeto, Redis + BullMQ oferece a melhor relação custo-benefício: fácil de configurar, in-memory (microsegundos), e o BullMQ é a biblioteca mais madura para filas em Node.js.
+O Redis foi escolhido por ser in-memory (latência de microssegundos), simples de operar via Docker e suficiente para o volume de mensagens deste sistema. O BullMQ é a biblioteca de filas mais madura do ecossistema Node.js.
 
 ---
 
-### 🤖 Por que NestJS e não Express puro?
+### 🤖 Framework — NestJS
 
-O **NestJS** traz para o Node.js conceitos de arquitetura enterprise:
+O **NestJS** estrutura a API com padrões de arquitetura enterprise sobre o Node.js:
 
-- **Injeção de Dependência (DI):** O framework gerencia as instâncias dos services. Facilita testes unitários — posso mockar o `PrismaService` sem subir o banco.
-- **Modularidade:** Cada feature (`news`, `auth`, `preferences`) é um módulo isolado. Fácil de extrair para um microserviço no futuro.
-- **Decorators:** O código fica declarativo — `@Get()`, `@UseGuards()`, `@ApiTags()` tornam a intenção clara sem boilerplate.
+- **Injeção de Dependência (DI):** o framework gerencia o ciclo de vida dos services, o que simplifica a escrita de testes unitários (ex.: mock do `PrismaService` sem subir o banco).
+- **Modularidade:** cada domínio (`news`, `auth`, `preferences`) é encapsulado em um módulo isolado, facilitando eventual extração para microserviços.
+- **Decorators declarativos:** `@Get()`, `@UseGuards()`, `@ApiTags()` tornam a intenção do código explícita e reduzem boilerplate.
 
 ---
 
