@@ -38,7 +38,7 @@ export const newsWorker = new Worker(
       throw error; // Repassa para o BullMQ fazer o retry
     }
   },
-  { connection: connection as any }
+  { connection: connection as any, concurrency: 3 }
 );
 
 newsWorker.on('completed', (job) => {
